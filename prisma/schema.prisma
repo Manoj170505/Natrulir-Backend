@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  tagline      String?
+  description  String
+  price        Float
+  originalPrice Float?
+  category     String   // "Live Microgreens", "Grow Kits", "Organic Seeds", "Superfood Blends", "Accessories"
+  image        String
+  badge        String?  // "Bestseller", "New", "Promotion", "Customer favorite", "Superfood"
+  rating       Float    @default(4.9)
+  reviewsCount Int      @default(85)
+  stock        Int      @default(50)
+  harvestTime  String?  // e.g. "Harvested Daily", "7-10 Days Grow Time"
+  nutrition    String[] @default([]) // e.g. ["Sulforaphane", "Vitamin C", "Zinc"]
+  tasteProfile String?  // e.g. "Spicy & Peppery", "Nutty & Crisp"
+  weight       String?  // e.g. "150g Fresh Tray", "500g Pack"
+  featured     Boolean  @default(false)
+  colors       String[] @default([]) // visual accents
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String      @unique
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+  city            String
+  state           String?
+  postalCode      String
+  notes           String?
+  status          String      @default("Pending") // "Pending", "Processing", "Order Picked", "Denied", "Delivered"
+  paymentMethod   String      @default("Cash on Delivery") // "Cash on Delivery", "Credit Card / UPI", "Online Payment"
+  paymentStatus   String      @default("Pending")
+  subtotal        Float
+  shippingFee     Float       @default(0)
+  discount        Float       @default(0)
+  totalAmount     Float
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+type OrderItem {
+  productId   String
+  productName String
+  productImage String
+  price       Float
+  quantity    Int
+  category    String?
+}
